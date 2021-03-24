@@ -1,31 +1,64 @@
 #include<iostream>
 #include <fstream>
 #include<string.h>
+#include <bits/stdc++.h>
 using namespace std;
 
 int compare(string output,string stopwords)
 {
-    for (int i = 0; i < 26; i++)
-    {
         int check = stopwords.compare(output);
-        if (check != 0)
+        if (check == 0)
         {
             cout << output << endl;
         }
-    }
 }
 
-void tokenize(string output)
+void tokenize(string output, string stopwords[], int size)
 {
-    string stopwords[] = {"a","is" ,"the","of" ,"all","and" ,"to","can","be","as","once" ,"for","at","am","are","has","have","had","up","his","her","in","on","no","we","do"};
-    for (int i = 0; i < 26; i++)
+    vector<string> tokens;
+    string line = "GeeksForGeeks is a must try";
+    stringstream check1(line);
+    string intermediate;
+    while (getline(check1, intermediate, ' '))
     {
-        compare(output, stopwords[i]);
+        tokens.push_back(intermediate);
     }
+
+    // Printing the token vector
+    for (int i = 0; i < tokens.size(); i++)
+        cout << tokens[i] << endl;
 }
+    // for (int i = 0; i < 26; i++)
+    // {
+    //     compare(output, stopwords[i]);
+    // }
+// }
 
 void fileread()
 {
+    string stopwords[33];
+    ifstream myReadFile1;
+    string dirname = "Stopword-List.txt";
+    myReadFile1.open(dirname);
+    string output;
+    int i = 0;
+    if (myReadFile1.is_open())
+    {
+        while (!myReadFile1.eof() && i <= 26)
+        {
+            myReadFile1 >> output;
+            stopwords[i] = output;
+            i++;
+        }
+    }
+    for(int j = 0; j < 26;j++)
+    {
+        //cout << stopwords[j] << endl;
+    }
+
+    myReadFile1.close();
+    cout << endl;
+
     ifstream myReadFile;
     string filename;
     for (int i = 50; i <= 50; i++)
@@ -51,8 +84,8 @@ void fileread()
             while (!myReadFile.eof())
             {
                 myReadFile >> output;
-                // cout << output;
-                tokenize(output);
+                cout << output;
+                //tokenize(output,stopwords,26);
             }
         }
         myReadFile.close();
