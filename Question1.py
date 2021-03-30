@@ -2,6 +2,7 @@ import io
 import os
 import json
 import string
+from tkinter import *
 
 split_string = ""
 Dict = {}
@@ -90,6 +91,7 @@ def fileread(txtDir,Dir1):
                                 counter = counter + 1
 
 def search(term):
+    # print(term)
     lst = ['1','2','3','4','5','6','7','8','9','10,',
     '11','12','13','14','15','16','17','18','19','20',
     '21','22','23','24','25','26','27','28','29','30',
@@ -120,7 +122,7 @@ def search(term):
         
 
     while not stack.isEmpty():
-        # print(stack.peek())
+        print(stack.peek())
         if stack.peek() != 'and' and stack.peek() != 'or' and stack.peek() != 'not':
             slash = stack.peek() 
             if ord(slash[0]) == 47:
@@ -166,62 +168,101 @@ def search(term):
                 # print("intersection is: " )
                 stack.pop()
             else:
-                value.append(Dict[stack.peek()][0].keys())
-                ans = value[-1]
-                wordstk.push(stack.peek()) 
-                stack.pop()
-                num = num + 1
+                if stack.peek() in Dict:
+                    # print(stack.peek())
+                    value.append(Dict[stack.peek()][0].keys())
+                    ans = value[-1]
+                    wordstk.push(stack.peek()) 
+                    stack.pop()
+                    num = num + 1
+                else:
+                    stack.pop()
+                    print("Not found")
         
         else:
             if stack.peek() == 'and':
                 stack.pop()
                 if stack.peek() == 'not':
                     stack.pop()
-                    value.append(Dict[stack.peek()][0].keys())
-                    stack.pop()
-                    temp = set(lst).difference(set(value[-1]))
-                    value.remove(value[-1])
-                    ans = set(temp).intersection(set(ans))
+                    if stack.peek() in Dict:
+                        value.append(Dict[stack.peek()][0].keys())
+                        stack.pop()
+                        temp = set(lst).difference(set(value[-1]))
+                        value.remove(value[-1])
+                        ans = set(temp).intersection(set(ans))
                 
                 else:
-                    value.append(Dict[stack.peek()][0].keys())
-                    stack.pop()
-                    temp = value[-1]
-                    value.remove(value[-1])
-                    ans = set(ans).intersection(set(temp))
+                    if stack.peek() in Dict:
+                        value.append(Dict[stack.peek()][0].keys())
+                        stack.pop()
+                        temp = value[-1]
+                        value.remove(value[-1])
+                        ans = set(ans).intersection(set(temp))
 
             elif  stack.peek() == 'or':
                 stack.pop()
                 if stack.peek() == 'not':
                     stack.pop()
-                    value.append(Dict[stack.peek()][0].keys())
-                    stack.pop()
-                    temp = set(lst).difference(set(value[-1]))
-                    value.remove(value[-1])
-                    ans = set(temp).union(set(ans))
+                    if stack.peek() in Dict:
+                        value.append(Dict[stack.peek()][0].keys())
+                        stack.pop()
+                        temp = set(lst).difference(set(value[-1]))
+                        value.remove(value[-1])
+                        ans = set(temp).union(set(ans))
                 
                 else:
-                    value.append(Dict[stack.peek()][0].keys())
-                    stack.pop()
-                    temp = value[-1]
-                    value.remove(value[-1])
-                    ans = set(ans).union(set(temp))
+                    if stack.peek() in Dict:
+                        value.append(Dict[stack.peek()][0].keys())
+                        stack.pop()
+                        temp = value[-1]
+                        value.remove(value[-1])
+                        ans = set(ans).union(set(temp))
             
             elif stack.peek() == 'not':
                 stack.pop()
-                value.append(Dict[stack.peek()][0].keys())
-                stack.pop()
-                ans = set(lst).difference(set(value[-1]))
-                value.remove(value[-1])
-
-    print(ans)
+                if stack.peek() in Dict:
+                    value.append(Dict[stack.peek()][0].keys())
+                    stack.pop()
+                    ans = set(lst).difference(set(value[-1]))
+                    value.remove(value[-1])
+    print(len(ans))
+    return ans
 
 def main():
     global freqcounter
     Dir = "D:\\izaan\\Work\\University\\university docs\\Semester 6\\IR\\Assignment\\Assignment 1\\ShortStories\\"
     Dir1 = "D:\\izaan\\Work\\University\\university docs\\Semester 6\\IR\\Assignment\\Assignment 1\\"
     fileread(Dir,Dir1)
-    query = input()
-    query = query.lower()
-    search(query)
+    
+    root = Tk()
+    root.title('Query Search Box')
+    bottomframe = Frame(root)
+    bottomframe.pack(side=BOTTOM)
+
+    def click():
+        s = entry.get()
+        s= s.lower()
+        answer = search(s)
+        if len(answer) == 0:
+            varia = Label(bottomframe, text="query not found").pack(side=LEFT)
+            varia.pack()
+        else:    
+            varia = Label(bottomframe, text=str(answer)).pack(side=LEFT)
+            varia.pack()
+
+
+    topframe = Frame(root)
+    Label(topframe, text='Text to find:').pack(side=LEFT)
+    entry = Entry(topframe)
+    entry.pack()
+    button = Button(topframe, text="search", command = click)
+    button.pack()
+    topframe.pack(side = TOP)
+    
+    
+    
+
+    root.mainloop()
+
+    
 main()
