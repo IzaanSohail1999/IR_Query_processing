@@ -6,7 +6,6 @@ import string
 split_string = ""
 Dict = {}
 freqcounter = 1
-
 class Stack:
      def __init__(self):
          self.items = []
@@ -87,6 +86,8 @@ def fileread(txtDir,Dir1):
                             if check == False:
                                 formindex(filenum, counter, split_string[i])
                                 counter = counter + 1
+                            else:
+                                counter = counter + 1
 
 def search(term):
     lst = ['1','2','3','4','5','6','7','8','9','10,',
@@ -96,14 +97,18 @@ def search(term):
     '41','42','43','44','45','46','47','48','49','50']
     
     num = 0
+    dist = 0
     value = []
     ans = []
+    cont1 = []
+    cont2 = []
     temp = []
+    nlst = []
     s = Stack()
     stack = Stack()
+    wordstk = Stack()
     term = term.split(' ')
     
-    # print(len(term))
     for x in term:
        s.push(x)
 
@@ -112,14 +117,60 @@ def search(term):
         s.pop()
         stack.push(word)
 
-
+        
 
     while not stack.isEmpty():
+        # print(stack.peek())
         if stack.peek() != 'and' and stack.peek() != 'or' and stack.peek() != 'not':
-            value.append(Dict[stack.peek()][0].keys())
-            ans = value[-1]
-            stack.pop()
-            num = num + 1
+            slash = stack.peek() 
+            if ord(slash[0]) == 47:
+                diff = int(slash[1])
+                # print(diff)
+                cont1 = value[-1]
+                value.remove(value[-1])
+                cont2 = value[-1]
+                value.remove(value[-1])
+                nlst = set(cont1).intersection(set(cont2))
+                # print(nlst)
+                # print(" ")
+                word1 = Dict[wordstk.pop()][0]
+                # print(word1)
+                # print(" ")
+                word2 = Dict[wordstk.pop()][0]
+                # print(word2)
+                # print(" ")
+                for docid in nlst:
+                    # print("doc id is: ", docid)                    
+                    if docid in word1:
+                        poswrd1 = word1[docid]
+                        # print("positions are: ", poswrd1)
+                        # print(" ")
+                    if docid in word2:
+                        poswrd2 = word2[docid]
+                        # print("positions are: ", poswrd2)
+                        # print(" ")
+                    # print(len(poswrd1))
+                    # print(len(poswrd2))
+                    for i in range(len(poswrd1)):
+                        for j in range(len(poswrd2)):
+                            match = poswrd1[i] - poswrd2[j]
+                            # print("match: ", match)
+                            if match < 0:
+                                match = match * -1
+                            if match == diff+1:
+                                # print("Valid document id is: " , docid)
+                                ans = docid
+                            else:
+                                continue
+                # print("Valid document id is: ", ans)
+                # print("intersection is: " )
+                stack.pop()
+            else:
+                value.append(Dict[stack.peek()][0].keys())
+                ans = value[-1]
+                wordstk.push(stack.peek()) 
+                stack.pop()
+                num = num + 1
         
         else:
             if stack.peek() == 'and':
@@ -166,11 +217,11 @@ def search(term):
     print(ans)
 
 def main():
-    # Dict1 = {}
     global freqcounter
     Dir = "D:\\izaan\\Work\\University\\university docs\\Semester 6\\IR\\Assignment\\Assignment 1\\ShortStories\\"
     Dir1 = "D:\\izaan\\Work\\University\\university docs\\Semester 6\\IR\\Assignment\\Assignment 1\\"
     fileread(Dir,Dir1)
-    query = "not please and not fever"
+    query = input()
+    query = query.lower()
     search(query)
 main()
