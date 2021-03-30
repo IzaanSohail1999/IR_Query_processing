@@ -7,6 +7,26 @@ split_string = ""
 Dict = {}
 freqcounter = 1
 
+class Stack:
+     def __init__(self):
+         self.items = []
+
+     def isEmpty(self):
+         return self.items == []
+
+     def push(self, item):
+         self.items.append(item)
+
+     def pop(self):
+         return self.items.pop()
+
+     def peek(self):
+         return self.items[len(self.items)-1]
+
+     def size(self):
+         return len(self.items)
+
+
 def clean(split_string):
     for x in range(len(split_string)):
         if ord(split_string[x]) < 97 or ord(split_string[x]) > 122:
@@ -69,57 +89,81 @@ def fileread(txtDir,Dir1):
                                 counter = counter + 1
 
 def search(term):
-    type = 0
-    value = []
-    term = term.split(' ')
-    for x in term:
-        if x == 'and':
-            print("boolean operator is : ", x)
-            type = 1
-        elif x == 'or':
-            print("boolean operator is : ", x)
-            type = 2
-        elif x == 'not':
-            print("boolean operator is : ", x)
-            type = 3
-        elif x in Dict:
-            value.append(Dict[x][0].keys())
-            
+    lst = ['1','2','3','4','5','6','7','8','9','10,',
+    '11','12','13','14','15','16','17','18','19','20',
+    '21','22','23','24','25','26','27','28','29','30',
+    '31','32','34','34','35','36','37','38','39','40',
+    '41','42','43','44','45','46','47','48','49','50']
     
-    if type == 0:
-        print(Dict[term][0])
-    if(type == 1):
-        print(set(value[0]).intersection(set(value[1])))
-        print(len(set(value[0]).intersection(set(value[1]))))
-    if(type == 2):
-        print(set(value[0]).union(set(value[1])))
-        print(len(set(value[0]).union(set(value[1]))))
-        
-    # for num in range(len(value[0])):
-    #     if value[0][num] == value[1][num]:
-    #         print(value[0][num])
+    num = 0
+    value = []
+    ans = []
+    temp = []
+    s = Stack()
+    stack = Stack()
+    term = term.split(' ')
+    
+    # print(len(term))
+    for x in term:
+       s.push(x)
 
-    # value[0].sort()
-    # value[1].sort()
-    # print(value[0])
-    # print(value[1])
-    # print(max(value[0]))
-    # print(max(value[1]))
-    # print(value[0][1])
-    # print(value[1][1])
-    # count = 0
-    # if type1 == 1:
-    # if len(value[0]) <= len(value[1]):
-    #         for num in range(len(value[0])):
-    #             if value[0][count] == value[1][count]:
-    #                 print(value[0][count])
-    #                 count = count + 1
-    # elif len(value[0]) > len(value[1]):
-    #         for num in range(len(value[1])):
-    #             if value[1][count] == value[0][count]:
-    #                 print(value[1][count])
-    #                 count = count + 1
-    # return Dict[term][0]
+    while not s.isEmpty():
+        word = s.peek()
+        s.pop()
+        stack.push(word)
+
+
+
+    while not stack.isEmpty():
+        if stack.peek() != 'and' and stack.peek() != 'or' and stack.peek() != 'not':
+            value.append(Dict[stack.peek()][0].keys())
+            ans = value[-1]
+            stack.pop()
+            num = num + 1
+        
+        else:
+            if stack.peek() == 'and':
+                stack.pop()
+                if stack.peek() == 'not':
+                    stack.pop()
+                    value.append(Dict[stack.peek()][0].keys())
+                    stack.pop()
+                    temp = set(lst).difference(set(value[-1]))
+                    value.remove(value[-1])
+                    ans = set(temp).intersection(set(ans))
+                
+                else:
+                    value.append(Dict[stack.peek()][0].keys())
+                    stack.pop()
+                    temp = value[-1]
+                    value.remove(value[-1])
+                    ans = set(ans).intersection(set(temp))
+
+            elif  stack.peek() == 'or':
+                stack.pop()
+                if stack.peek() == 'not':
+                    stack.pop()
+                    value.append(Dict[stack.peek()][0].keys())
+                    stack.pop()
+                    temp = set(lst).difference(set(value[-1]))
+                    value.remove(value[-1])
+                    ans = set(temp).union(set(ans))
+                
+                else:
+                    value.append(Dict[stack.peek()][0].keys())
+                    stack.pop()
+                    temp = value[-1]
+                    value.remove(value[-1])
+                    ans = set(ans).union(set(temp))
+            
+            elif stack.peek() == 'not':
+                stack.pop()
+                value.append(Dict[stack.peek()][0].keys())
+                stack.pop()
+                ans = set(lst).difference(set(value[-1]))
+                value.remove(value[-1])
+
+    print(ans)
 
 def main():
     # Dict1 = {}
@@ -127,20 +171,6 @@ def main():
     Dir = "D:\\izaan\\Work\\University\\university docs\\Semester 6\\IR\\Assignment\\Assignment 1\\ShortStories\\"
     Dir1 = "D:\\izaan\\Work\\University\\university docs\\Semester 6\\IR\\Assignment\\Assignment 1\\"
     fileread(Dir,Dir1)
-    # print(json.dumps(Dict,sort_keys=True, indent=4))
-    # print(Dict)
-    # print(freqcounter)
-    # query = input()
-    query = "beard"
+    query = "not please and not fever"
     search(query)
-    # print(query.split(' '))
-    # query = query.split(' ')
-    # print(len(query))
-    # for x in query:
-    #     if x == "and":
-    #         type = "1"
-    #         continue
-    #     else:
-    #         print(x)
-    #         search(x)
 main()
